@@ -1,0 +1,15 @@
+{
+    "name": "gabriel/recreating-classes",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Gabriel Vitor",
+            "email": "git624886@gmail.com"
+        }
+    ],
+    "require": {}
+}
