@@ -18,4 +18,4 @@ $objRequest = new Request();
 
 $objRouter = new Router(URL);
 
-$objRouter->getRoute();
+$objRouter->run();

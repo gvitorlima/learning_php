@@ -45,28 +45,56 @@ class Router
     self::addRoute('DELETE', $route, $data);
   }
 
+  public function run()
+  {
+    try {
+      $route = $this->getRoute();
+      if (!isset($route['controller']))
+        throw new Exception('O servidor não pode processar essa requisição', 500);
+
+      echo call_user_func_array($route['controller'], $route['vars']);
+      exit;
+    } catch (Exception $err) {
+    }
+  }
+
   public function getRoute()
   {
     $uri = self::getUri();
 
     foreach (self::$routes as $patternRoute => $method) {
-      if (preg_match($patternRoute, $uri)) {
+      if (preg_match($patternRoute, $uri, $matches))
         if ($method[self::$httpMethod]) {
-          return $method['controller'];
+          unset($matches[0]);
+
+          $method[self::$httpMethod]['vars'] = array_combine(
+            $method[self::$httpMethod]['vars'][0],
+            $matches
+          );
+          return $method[self::$httpMethod];
         }
-        throw new Exception("Método não permitido", 405);
-      }
+
+      throw new Exception("Método não permitido", 405);
     }
+
     throw new Exception("Rota não encontrada", 404);
   }
 
-  private static function addRoute(string $method, string $route, array $params)
+  private static function addRoute(string $method, string $route, array $params, $group = null)
   {
     foreach ($params as $key => $controller) {
       if ($controller instanceof Closure) {
         $params['controller'] = $controller;
         unset($params[$key]);
       }
+    }
+
+    $patternVariables = '/{(.*?)}/';
+    if (preg_match_all($patternVariables, $route, $matches)) {
+      unset($matches[0]);
+      $params['vars'] = array_values($matches);
+
+      $route = preg_replace($patternVariables, '(.*?)', $route);
     }
 
     $patternRoute = '/^' . str_replace('/', '\/', $route) . '$/';
