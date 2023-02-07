@@ -1,13 +1,12 @@
 <?php
 
+use App\Controller\ControllerTest\Test;
 use App\Http\Router;
 
-Router::get('/list', [
-  function () {
-  }
-]);
 
-Router::post('/create', [
-  function () {
+Router::get('/list/{id}', [
+  function (int $id) {
+    $controller = new Test;
+    return $controller->getOpa();
   }
 ]);
