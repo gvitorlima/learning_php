@@ -3,19 +3,61 @@
 namespace App\Http;
 
 use Closure;
+use Exception;
 
 class Router
 {
-  private readonly string
+  public static array
+    $routes;
+
+  private static Request
+    $request;
+
+  private static string
+    $httpMethod,
     $prefix;
+
   public function __construct(string $url)
   {
     $this->setPrefix($url);
+
+    self::$request = new Request;
+    self::$httpMethod = self::$request->getHttpMethod();
   }
 
-  public static function GET(string $route, array $data)
+  public static function get(string $route, array $data)
   {
     self::addRoute('GET', $route, $data);
+  }
+
+  public static function post(string $route, array $data)
+  {
+    self::addRoute('POST', $route, $data);
+  }
+
+  public static function put(string $route, array $data)
+  {
+    self::addRoute('PUT', $route, $data);
+  }
+
+  public static function delete(string $route, array $data)
+  {
+    self::addRoute('DELETE', $route, $data);
+  }
+
+  public function getRoute()
+  {
+    $uri = self::getUri();
+
+    foreach (self::$routes as $patternRoute => $method) {
+      if (preg_match($patternRoute, $uri)) {
+        if ($method[self::$httpMethod]) {
+          return $method['controller'];
+        }
+        throw new Exception("Método não permitido", 405);
+      }
+    }
+    throw new Exception("Rota não encontrada", 404);
   }
 
   private static function addRoute(string $method, string $route, array $params)
@@ -27,12 +69,24 @@ class Router
       }
     }
 
-      
+    $patternRoute = '/^' . str_replace('/', '\/', $route) . '$/';
+    self::$routes[$patternRoute][$method] = $params;
   }
 
   private function setPrefix(string $url): void
   {
     $url = parse_url($url);
-    $this->prefix = $url['path'] ?? '';
+    self::$prefix = $url['path'] ?? '';
+  }
+
+  public static function getUri()
+  {
+    $uri = self::$request->getUri();
+    $uri = str_replace(self::$prefix, '', $uri) ?? $uri;
+
+    if (str_ends_with($uri, '/')) {
+      $uri = substr($uri, 0, strlen($uri) - 1);
+    }
+    return $uri;
   }
 }
