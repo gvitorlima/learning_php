@@ -8,6 +8,7 @@ use Exception;
 class Router
 {
   public static array
+    $variables,
     $routes;
 
   private static Request
@@ -80,7 +81,7 @@ class Router
     throw new Exception("Rota não encontrada", 404);
   }
 
-  private static function addRoute(string $method, string $route, array $params, $group = null)
+  private static function addRoute(string $method, string $route, array $params)
   {
     foreach ($params as $key => $controller) {
       if ($controller instanceof Closure) {
@@ -89,25 +90,25 @@ class Router
       }
     }
 
+    self::getVariables($route, $params);
+
+    $patternRoute = '/^' . str_replace('/', '\/', $route) . '$/';
+    self::$routes[$patternRoute][$method] = $params;
+  }
+
+  private static function getVariables(string &$route, array &$params)
+  {
     $patternVariables = '/{(.*?)}/';
+
     if (preg_match_all($patternVariables, $route, $matches)) {
       unset($matches[0]);
       $params['vars'] = array_values($matches);
 
       $route = preg_replace($patternVariables, '(.*?)', $route);
     }
-
-    $patternRoute = '/^' . str_replace('/', '\/', $route) . '$/';
-    self::$routes[$patternRoute][$method] = $params;
   }
 
-  private function setPrefix(string $url): void
-  {
-    $url = parse_url($url);
-    self::$prefix = $url['path'] ?? '';
-  }
-
-  public static function getUri()
+  private static function getUri()
   {
     $uri = self::$request->getUri();
     $uri = str_replace(self::$prefix, '', $uri) ?? $uri;
@@ -116,5 +117,11 @@ class Router
       $uri = substr($uri, 0, strlen($uri) - 1);
     }
     return $uri;
+  }
+
+  private function setPrefix(string $url): void
+  {
+    $url = parse_url($url);
+    self::$prefix = $url['path'] ?? '';
   }
 }
