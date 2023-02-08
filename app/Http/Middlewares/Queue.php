@@ -18,9 +18,8 @@ class Queue
       return call_user_func_array($this->controller, $this->vars);
 
     foreach ($this->middle as $key => $middleware) {
-      if (!is_callable($middleware))
+      if (!class_exists($middleware))
         throw new Exception("Middleware inválido", 500);
-
 
       $actualMiddleware = new $middleware;
       unset($this->middle[$key]);
