@@ -9,11 +9,7 @@ abstract class AbstractMiddleware
 {
   final public function __invoke(Request $request, Closure $next)
   {
-    $this->handle($request, $next);
-  }
-
-  final static function middlewares(array $middlewares)
-  {
+    return $this->handle($request, $next);
   }
 
   abstract public function handle(Request $request, Closure $next);
