@@ -34,12 +34,14 @@ class Response
 
         $this->sendHeaders();
         $content = json_encode($this->content);
-        exit($content);
+        print_r($content);
+        exit;
 
       case 'text/html':
 
         $this->sendHeaders();
-        exit($this->content);
+        print_r($this->content);
+        exit;
     }
   }
 
