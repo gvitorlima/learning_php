@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middlewares\Queue;
 use Closure;
 use Exception;
 
@@ -18,9 +19,14 @@ class Router
     $httpMethod,
     $prefix;
 
+  private Response
+    $response;
+
   public function __construct(string $url)
   {
     $this->setPrefix($url);
+
+    $this->response = new Response(200, '');
 
     self::$request = new Request;
     self::$httpMethod = self::$request->getHttpMethod();
@@ -46,16 +52,31 @@ class Router
     self::addRoute('DELETE', $route, $data);
   }
 
-  public function run()
+  public function run(): Response
   {
     try {
       $route = $this->getRoute();
       if (!isset($route['controller']))
         throw new Exception('O servidor não pode processar essa requisição', 500);
 
-      echo call_user_func_array($route['controller'], $route['vars']);
-      exit;
+      $queue = new Queue(
+        $route['middlewares'],
+        $route['vars'],
+        $route['controller']
+      );
+
+      $response = $queue->next(self::$request);
+
+      return is_a($response, Response::class)
+        ? $response : $this->response->setResponse(200, $response);
     } catch (Exception $err) {
+      return $this->response->setResponse(
+        $err->getCode(),
+        [
+          'code' => $err->getCode(),
+          'message' => $err->getMessage()
+        ]
+      );
     }
   }
 
@@ -68,10 +89,14 @@ class Router
         if ($method[self::$httpMethod]) {
           unset($matches[0]);
 
+          $vars = $method[self::$httpMethod]['vars'][0];
           $method[self::$httpMethod]['vars'] = array_combine(
-            $method[self::$httpMethod]['vars'][0],
+            $vars,
             $matches
           );
+
+          $method[self::$httpMethod]['vars']['request'] = self::$request;
+
           return $method[self::$httpMethod];
         }
 
