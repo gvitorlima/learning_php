@@ -29,7 +29,7 @@ class Queue
         return $queue->next($request);
       };
 
-      $actualMiddleware($request, $next);
+      return $actualMiddleware($request, $next);
     }
   }
 }
