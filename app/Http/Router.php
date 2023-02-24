@@ -89,14 +89,15 @@ class Router
         if ($method[self::$httpMethod]) {
           unset($matches[0]);
 
-          $vars = $method[self::$httpMethod]['vars'][0];
-          $method[self::$httpMethod]['vars'] = array_combine(
-            $vars,
-            $matches
-          );
+          if (key_exists('vars', $method[self::$httpMethod])) {
+            $vars = $method[self::$httpMethod]['vars'][0];
+            $method[self::$httpMethod]['vars'] = array_combine(
+              $vars,
+              $matches
+            );
+          }
 
           $method[self::$httpMethod]['vars']['request'] = self::$request;
-
           return $method[self::$httpMethod];
         }
 
