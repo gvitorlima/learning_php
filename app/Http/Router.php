@@ -60,8 +60,8 @@ class Router
         throw new Exception('O servidor não pode processar essa requisição', 500);
 
       $queue = new Queue(
-        $route['middlewares'],
-        $route['vars'],
+        $route['middlewares'] ?? [],
+        $route['vars'] ?? [],
         $route['controller']
       );
 
