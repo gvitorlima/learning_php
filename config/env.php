@@ -8,5 +8,5 @@ foreach ($file as $line) {
     continue;
   }
 
-  putenv($line);
+  putenv(trim($line));
 }
