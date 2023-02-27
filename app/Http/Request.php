@@ -15,13 +15,13 @@ class Request
 
   public function __construct()
   {
-    $this->headers = getallheaders();
+    $this->headers = getallheaders() ?? [];
 
     $this->uri = $_SERVER['PATH_INFO'];
     $this->httpMethod = $_SERVER['REQUEST_METHOD'];
 
-    $this->queryParams = $_GET;
-    $this->postVars = json_decode(file_get_contents('php://input'), true);
+    $this->queryParams = $_GET ?? [];
+    $this->postVars = json_decode(file_get_contents('php://input'), true) ?? [];
   }
 
   public function getPostVars()
