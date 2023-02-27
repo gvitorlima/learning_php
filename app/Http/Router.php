@@ -85,8 +85,10 @@ class Router
     $uri = self::getUri();
 
     foreach (self::$routes as $patternRoute => $method) {
-      if (preg_match($patternRoute, $uri, $matches))
-        if ($method[self::$httpMethod]) {
+
+      if (preg_match($patternRoute, $uri, $matches)) {
+
+        if (isset($method[self::$httpMethod])) {
           unset($matches[0]);
 
           if (key_exists('vars', $method[self::$httpMethod])) {
@@ -101,7 +103,8 @@ class Router
           return $method[self::$httpMethod];
         }
 
-      throw new Exception("Método não permitido", 405);
+        throw new Exception("Método não permitido", 405);
+      }
     }
 
     throw new Exception("Rota não encontrada", 404);
