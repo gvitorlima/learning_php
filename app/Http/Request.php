@@ -6,6 +6,7 @@ class Request
 {
   private array
     $headers,
+    $payload,
     $postVars,
     $queryParams;
 
@@ -22,6 +23,11 @@ class Request
 
     $this->queryParams = $_GET ?? [];
     $this->postVars = json_decode(file_get_contents('php://input'), true) ?? [];
+  }
+
+  public function setPayload(array $fields)
+  {
+    $this->payload = $fields;
   }
 
   public function getPostVars()
@@ -47,5 +53,13 @@ class Request
   public function getUri()
   {
     return $this->uri;
+  }
+
+  public function getPayload(?string $field = null)
+  {
+    if (is_null($field))
+      return $this->payload;
+
+    return $this->payload[$field];
   }
 }
