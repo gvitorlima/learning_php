@@ -27,17 +27,14 @@ class LoginController
 
       if (empty($email) || empty($password))
         throw new Exception($patternErr, 400);
-
       // $hashPassword = $this->hashPassword($password);
 
       $userData = $this->repository->get($email);
-      if (empty($userData))
+      if (empty($userData) || !password_verify($password, $userData['password']))
         throw new Exception($patternErr, 404);
 
-      if (!password_verify($password, $userData['password']))
-        throw new Exception($patternErr, 400);
-
-      return Jwt::newJwt();
+      $request->setPayload($userData);
+      return Jwt::newJwt($request);
     } catch (Exception $err) {
       echo '<pre>';
       print_r($err->getMessage());
@@ -46,7 +43,7 @@ class LoginController
     }
   }
 
-  public function hashPassword(string $password): string
+  private function hashPassword(string $password): string
   {
     return password_hash($password, PASSWORD_BCRYPT, [
       'salt' =>  getenv('JWT_SALT')
