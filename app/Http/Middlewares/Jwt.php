@@ -10,7 +10,7 @@ class Jwt extends AbstractMiddleware
 {
   public function handle(Request $request, Closure $next)
   {
-    $this->newJwt($request);
+    $this->verifyJwt($request);
     return $next($request);
   }
 
@@ -33,7 +33,7 @@ class Jwt extends AbstractMiddleware
     }
   }
 
-  public static function newJwt()
+  public static function newJwt(Request $request)
   {
     try {
 
@@ -41,7 +41,28 @@ class Jwt extends AbstractMiddleware
         'alg' => 'HS256',
         'typ' => 'JWT'
       ];
+
+      $payload = $request->getPayload();
+      if (empty($payload))
+        throw new Exception("Payload vazio, impossível gerar um token", 500);
+
+      $header   = json_encode($header);
+      $payload  = json_encode($payload);
+
+      $base64data = base64_encode($header . '.' . $payload);
+
+      $jwt = hash_hmac('sha512', $base64data, getenv('JWT_SALT'));
+      $jwt = base64_encode($header) . '.' . base64_encode($payload) . '.' . base64_encode($jwt);
+      $jwt =  str_replace('=', '', $jwt);
+
+      return [
+        'token' => $jwt
+      ];
     } catch (Exception $err) {
+      echo '<pre>';
+      print_r($err->getMessage());
+      echo '</pre>';
+      exit;
     }
   }
 }
