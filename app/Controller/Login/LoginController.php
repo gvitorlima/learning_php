@@ -34,7 +34,7 @@ class LoginController
         throw new Exception($patternErr, 404);
 
       $request->setPayload($userData);
-      return Jwt::newJwt($request);
+      return Jwt::create($request);
     } catch (Exception $err) {
       echo '<pre>';
       print_r($err->getMessage());
