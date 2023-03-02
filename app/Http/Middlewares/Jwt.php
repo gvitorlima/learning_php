@@ -10,21 +10,32 @@ class Jwt extends AbstractMiddleware
 {
   public function handle(Request $request, Closure $next)
   {
-    $this->verifyJwt($request);
+    // $this->verifyJwt($request);
     return $next($request);
   }
 
-  private function verifyJwt(Request $request)
+  public static function create(Request $request)
   {
     try {
-      $token = $request->getHeaders()['Authorization'] ?? throw new Exception("Jwt autenticação necessária", 400);
-      if (!isset($token))
-        throw new Exception("Verifique a autenticação passada e tente novamente", 400);
 
-      echo '<pre>';
-      print_r($_SERVER);
-      echo '</pre>';
-      exit;
+      $payload = $request->getPayload();
+      if (empty($payload))
+        throw new Exception("Não foi possível criar um token, payload vazio", 500);
+
+      $header = [
+        'alg' => 'HS256',
+        'typ' => 'JWT'
+      ];
+
+      $header = json_encode($header);
+      $payload = json_encode($payload);
+
+      $signature = hash_hmac("SHA256", self::base64encode($header) . '.' . self::base64encode($payload), getenv('JWT_SALT'), true);
+
+      $jwt = self::base64encode($header) . '.' . self::base64encode($payload) . '.' . self::base64encode($signature);
+      return [
+        'token' => $jwt
+      ];
     } catch (Exception $err) {
       echo '<pre>';
       print_r($err->getMessage());
@@ -33,30 +44,9 @@ class Jwt extends AbstractMiddleware
     }
   }
 
-  public static function newJwt(Request $request)
+  private function verifyJwt(Request $request)
   {
     try {
-
-      $header = [
-        'alg' => 'HS256',
-        'typ' => 'JWT'
-      ];
-
-      $payload = $request->getPayload();
-      if (empty($payload))
-        throw new Exception("Payload vazio, impossível gerar um token", 500);
-
-      $header   = json_encode($header);
-      $payload  = json_encode($payload);
-
-      $base64data = self::base64encode($header) . '.' . self::base64encode($payload);
-
-      $jwt = hash_hmac('sha256', $base64data, getenv('JWT_SALT'), true);
-      $jwt = self::base64encode($header) . '.' . self::base64encode($payload) . '.' . self::base64encode($jwt);
-
-      return [
-        'token' => $jwt
-      ];
     } catch (Exception $err) {
       echo '<pre>';
       print_r($err->getMessage());
@@ -84,6 +74,12 @@ class Jwt extends AbstractMiddleware
    */
   private static function base64encode(string $data)
   {
-    return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
+    $data = base64_encode($data);
+    return str_replace(['+', '/', '='], ['-', '_', ''], $data);
+  }
+
+  private function base64decode(string $data)
+  {
+    return base64_decode(str_replace(['-', '_'], ['+', '/'], $data));
   }
 }
