@@ -12,10 +12,12 @@ class Request
 
   private string
     $httpMethod,
+    $rootPath,
     $uri;
 
   public function __construct()
   {
+    $this->rootPath = $_SERVER['DOCUMENT_ROOT'];
     $this->headers = getallheaders() ?? [];
 
     $this->uri = $_SERVER['PATH_INFO'];
@@ -61,5 +63,10 @@ class Request
       return $this->payload;
 
     return $this->payload[$field];
+  }
+
+  public function getRootPath()
+  {
+    return $this->rootPath;
   }
 }
