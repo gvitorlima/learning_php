@@ -27,7 +27,7 @@ class Cache extends AbstractMiddleware
     }
   }
 
-  public function cache(Request $request, Closure $next)
+  private function cache(Request $request, Closure $next)
   {
     $this->fileName = $this->mountName($request->getUri());
     $this->pathCache = $request->getRootPath() . '/../app/Cache/';
@@ -64,7 +64,7 @@ class Cache extends AbstractMiddleware
     $modificationTime =  date('Y-m-d H:i', filemtime($this->filePath));
     $modificationTime = (new DateTime($modificationTime))->diff((new DateTime()));
 
-    if ($modificationTime->i >= 30 || $modificationTime->days >= 1)
+    if ($modificationTime->i >= 30 || $modificationTime->h >= 1 || $modificationTime->days >= 1)
       return false;
 
     return true;
