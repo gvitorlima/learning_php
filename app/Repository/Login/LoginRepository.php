@@ -2,15 +2,16 @@
 
 namespace App\Repository\Login;
 
-use App\Database\Database;
+use App\Databases\Database;
+use App\Databases\dsnPrefix;
+use App\Databases\LearningAuth;
 
 class LoginRepository
 {
   private Database $database;
-
   public function __construct()
   {
-    $this->database = new Database('DB_');
+    $this->database = new Database(LearningAuth::getInstance(), dsnPrefix::firebird);
   }
 
   public function get(string $email)
