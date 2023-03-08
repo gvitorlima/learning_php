@@ -2,14 +2,16 @@
 
 namespace App\Repository\Example;
 
-use App\Database\Database;
+use App\Database\LearningAuth;
+use App\Databases\Database;
+use App\Databases\dsnPrefix;
 
 class ExampleMiddlewaresRepository
 {
   private Database $database;
   public function __construct()
   {
-    $this->database = new Database('FK_');
+    $this->database = new Database(LearningAuth::getInstance(), dsnPrefix::firebird);
   }
 
   public function getCacheData()
