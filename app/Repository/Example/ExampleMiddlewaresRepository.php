@@ -2,9 +2,9 @@
 
 namespace App\Repository\Example;
 
-use App\Database\LearningAuth;
 use App\Databases\Database;
 use App\Databases\dsnPrefix;
+use App\Databases\LearningAuth;
 
 class ExampleMiddlewaresRepository
 {
