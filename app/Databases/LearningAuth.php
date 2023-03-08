@@ -2,9 +2,9 @@
 
 namespace App\Databases;
 
-use App\Interfaces\DatabaseInterface;
+use App\Interfaces\DatabaseInstance;
 
-class LearningAuth implements DatabaseInterface
+class LearningAuth implements DatabaseInstance
 {
   public static string
     $dsn,
