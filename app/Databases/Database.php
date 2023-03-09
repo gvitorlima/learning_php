@@ -5,7 +5,7 @@ namespace App\Databases;
 use Exception;
 use PDO;
 
-enum dsnPrefix
+enum enumPrefix
 {
   case firebird;
   case mysql;
@@ -19,19 +19,19 @@ class Database
   private static object
     $instance;
 
-  private static dsnPrefix
+  private static enumPrefix
     $dsn;
 
   private PDO $objPdo;
 
-  public function __construct(object $instance, dsnPrefix $dsn)
+  public function __construct(object $instance, enumPrefix $dsn)
   {
     self::$dsn = $dsn;
     self::$instance = $instance;
 
     match ($dsn) {
-      dsnPrefix::firebird => $this->firebirdStringConnection($instance),
-      dsnPrefix::mysql => throw new Exception("Não implementada conexão com Mysql", 500)
+      enumPrefix::firebird => $this->firebirdStringConnection($instance),
+      enumPrefix::mysql => throw new Exception("Não implementada conexão com Mysql", 500)
     };
 
     $this->connection();

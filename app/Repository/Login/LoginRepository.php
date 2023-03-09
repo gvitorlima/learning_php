@@ -3,7 +3,7 @@
 namespace App\Repository\Login;
 
 use App\Databases\Database;
-use App\Databases\dsnPrefix;
+use App\Databases\enumPrefix;
 use App\Databases\LearningAuth;
 
 class LoginRepository
@@ -11,7 +11,7 @@ class LoginRepository
   private Database $database;
   public function __construct()
   {
-    $this->database = new Database(LearningAuth::getInstance(), dsnPrefix::firebird);
+    $this->database = new Database(LearningAuth::getInstance(), enumPrefix::firebird);
   }
 
   public function get(string $email)
