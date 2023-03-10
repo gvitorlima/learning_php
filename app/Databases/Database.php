@@ -28,7 +28,6 @@ class Database
   {
     self::$dsn = $dsn;
     self::$instance = $instance;
-
     match ($dsn) {
       enumPrefix::firebird => $this->firebirdStringConnection($instance),
       enumPrefix::mysql => throw new Exception("Não implementada conexão com Mysql", 500)
@@ -57,7 +56,7 @@ class Database
   private function connection()
   {
     try {
-      $this->objPdo = new PDO($this->stringConnection, self::$instance::$user, self::$instance::$password);
+      $this->objPdo = new PDO($this->stringConnection, self::$instance->user(), self::$instance->password());
       $this->setAttributes();
     } catch (Exception $err) {
       echo '<pre>';
@@ -79,6 +78,6 @@ class Database
    */
   private function firebirdStringConnection(object $instance)
   {
-    $this->stringConnection = $instance::$dsn . ':dbname=' . $instance::$host . ':' . $instance::$path . ';charset=utf-8;dialect=1';
+    $this->stringConnection = $instance->dsn() . ':dbname=' . $instance->host() . ':' . $instance->path() . ';charset=utf-8;dialect=1';
   }
 }
