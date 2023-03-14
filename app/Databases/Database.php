@@ -2,6 +2,7 @@
 
 namespace App\Databases;
 
+use App\Interfaces\DatabaseInstance;
 use Exception;
 use PDO;
 
@@ -24,7 +25,7 @@ class Database
 
   private PDO $objPdo;
 
-  public function __construct(object $instance, enumPrefix $dsn)
+  public function __construct(DatabaseInstance $instance, enumPrefix $dsn)
   {
     self::$dsn = $dsn;
     self::$instance = $instance;
