@@ -11,7 +11,7 @@ class LoginRepository
   private Database $database;
   public function __construct()
   {
-    $this->database = new Database(LearningAuth::getInstance(), enumPrefix::firebird);
+    $this->database = new Database(LearningAuth::getInstance());
   }
 
   public function get(string $email)
