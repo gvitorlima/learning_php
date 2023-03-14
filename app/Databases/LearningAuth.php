@@ -44,10 +44,10 @@ class LearningAuth implements iDatabaseConfig
 
   private function __construct(string $suffix)
   {
-    self::$dsn = getenv($suffix . 'DRIVER');
-    self::$host = getenv($suffix . 'HOST');
-    self::$password = getenv($suffix . 'PASS');
-    self::$path = getenv($suffix . 'PATH');
-    self::$user = getenv($suffix . 'USER');
+    $this->dsn = getenv($suffix . 'DRIVER');
+    $this->host = getenv($suffix . 'HOST');
+    $this->password = getenv($suffix . 'PASS');
+    $this->path = getenv($suffix . 'PATH');
+    $this->user = getenv($suffix . 'USER');
   }
 }
