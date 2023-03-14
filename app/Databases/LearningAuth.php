@@ -2,84 +2,52 @@
 
 namespace App\Databases;
 
-use App\Interfaces\DatabaseInstance;
+use App\Interfaces\iDatabaseConfig;
 
-class LearningAuth implements DatabaseInstance
+class LearningAuth implements iDatabaseConfig
 {
-  private static string
-    $dsn,
-    $host,
-    $password,
-    $path,
-    $string,
-    $stringConnection,
-    $user;
+  const SUFFIX_DATABASE = 'FK_';
 
-  private static self
-    $instance;
+  private string
+    $dsn, $host, $password, $path, $user;
 
-  public static function getInstance()
+  private static LearningAuth $instance;
+
+  public static function getInstance(): LearningAuth
   {
-    if (isset(self::$instance))
-      return self::$instance;
+    if (!isset(self::$instance))
+      self::$instance = new self(self::SUFFIX_DATABASE);
 
-    self::init();
-    return self::$instance = new self;
+    return self::$instance;
   }
 
-  private static function init(string $suffix = 'FK_')
+  public function stringConnection(): string
+  {
+    $stringConnection = 'firebird:dbname=' . $this->host . ':' . $this->path . ';charset=utf-8;dialect=1';
+    return $stringConnection;
+  }
+
+  public function user(): string
+  {
+    return $this->user;
+  }
+
+  public function password(): string
+  {
+    return $this->password;
+  }
+
+  public function driver(): string
+  {
+    return $this->dsn;
+  }
+
+  private function __construct(string $suffix)
   {
     self::$dsn = getenv($suffix . 'DRIVER');
     self::$host = getenv($suffix . 'HOST');
     self::$password = getenv($suffix . 'PASS');
     self::$path = getenv($suffix . 'PATH');
     self::$user = getenv($suffix . 'USER');
-  }
-
-  private function __construct()
-  {
-  }
-
-  private function __clone()
-  {
-  }
-
-  private function __wakeup()
-  {
-  }
-
-  public function dsn()
-  {
-    return self::$dsn;
-  }
-
-  public function host()
-  {
-    return self::$host;
-  }
-
-  public function password()
-  {
-    return self::$password;
-  }
-
-  public function path()
-  {
-    return self::$path;
-  }
-
-  public function string()
-  {
-    return self::$string;
-  }
-
-  public function stringConnection()
-  {
-    return self::$stringConnection;
-  }
-
-  public function user()
-  {
-    return self::$user;
   }
 }
