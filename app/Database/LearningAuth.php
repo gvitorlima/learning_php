@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Databases;
+namespace App\Database;
 
 use App\Interfaces\iDatabaseConfig;
 
@@ -9,7 +9,7 @@ class LearningAuth implements iDatabaseConfig
   const SUFFIX_DATABASE = 'FK_';
 
   private string
-    $dsn, $host, $password, $path, $user;
+    $dsn, $host, $name, $password, $path, $user;
 
   private static LearningAuth $instance;
 
@@ -23,7 +23,7 @@ class LearningAuth implements iDatabaseConfig
 
   public function stringConnection(): string
   {
-    $stringConnection = 'firebird:dbname=' . $this->host . ':' . $this->path . ';charset=utf-8;dialect=1';
+    $stringConnection = $this->dsn . ':dbname=' . $this->host . ':' . $this->path . ';charset=utf-8;dialect=1';
     return $stringConnection;
   }
 
@@ -46,6 +46,7 @@ class LearningAuth implements iDatabaseConfig
   {
     $this->dsn = getenv($suffix . 'DRIVER');
     $this->host = getenv($suffix . 'HOST');
+    $this->name = getenv($suffix . 'NAME');
     $this->password = getenv($suffix . 'PASS');
     $this->path = getenv($suffix . 'PATH');
     $this->user = getenv($suffix . 'USER');

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Databases;
+namespace App\Database\Configs;
 
 use App\Interfaces\iDatabaseConfig;
 use Exception;
@@ -8,7 +8,7 @@ use PDO;
 
 class Database
 {
-  private static PDO $pdo;
+  private PDO $pdo;
 
   public function __construct(iDatabaseConfig $databaseInstance)
   {
@@ -35,6 +35,12 @@ class Database
   private function configConnection(iDatabaseConfig $instance)
   {
     try {
+
+      echo '<pre>';
+      print_r($instance->stringConnection());
+      echo '</pre>';
+      exit;
+
       $pdo = new PDO($instance->stringConnection(), $instance->user(), $instance->password());
 
       $pdo->setAttribute(PDO::ATTR_ORACLE_NULLS, PDO::NULL_EMPTY_STRING);

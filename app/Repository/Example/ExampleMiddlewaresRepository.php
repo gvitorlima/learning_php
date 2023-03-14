@@ -2,9 +2,8 @@
 
 namespace App\Repository\Example;
 
-use App\Databases\Database;
-use App\Databases\enumPrefix;
-use App\Databases\LearningAuth;
+use App\Database\Configs\Database;
+use App\Database\LearningAuth;
 
 class ExampleMiddlewaresRepository
 {
