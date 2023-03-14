@@ -2,83 +2,51 @@
 
 namespace App\Databases;
 
-use App\Interfaces\DatabaseInstance;
+use App\Interfaces\iDatabaseConfig;
 use Exception;
 use PDO;
 
-enum enumPrefix
-{
-  case firebird;
-  case mysql;
-};
-
 class Database
 {
-  private string
-    $stringConnection;
+  private static PDO $pdo;
 
-  private static object
-    $instance;
-
-  private static enumPrefix
-    $dsn;
-
-  private PDO $objPdo;
-
-  public function __construct(DatabaseInstance $instance, enumPrefix $dsn)
+  public function __construct(iDatabaseConfig $databaseInstance)
   {
-    self::$dsn = $dsn;
-    self::$instance = $instance;
-    match ($dsn) {
-      enumPrefix::firebird => $this->firebirdStringConnection($instance),
-      enumPrefix::mysql => throw new Exception("Não implementada conexão com Mysql", 500)
-    };
-
-    $this->connection();
+    $this->configConnection($databaseInstance);
   }
 
   public function executeQuery(string $query)
   {
     try {
 
-      $this->objPdo->beginTransaction();
-      $prepareQuery = $this->objPdo->prepare($query);
+      $this->pdo->beginTransaction();
+      $prepareQuery = $this->pdo->prepare($query);
       $prepareQuery->execute();
 
       $results = $prepareQuery->fetchAll(PDO::FETCH_ASSOC);
-      $this->objPdo->commit();
+      $this->pdo->commit();
 
       return $results;
     } catch (Exception $err) {
-      $this->objPdo->rollBack();
+      $this->pdo->rollBack();
     }
   }
 
-  private function connection()
+  private function configConnection(iDatabaseConfig $instance)
   {
     try {
-      $this->objPdo = new PDO($this->stringConnection, self::$instance->user(), self::$instance->password());
-      $this->setAttributes();
+      $pdo = new PDO($instance->stringConnection(), $instance->user(), $instance->password());
+
+      $pdo->setAttribute(PDO::ATTR_ORACLE_NULLS, PDO::NULL_EMPTY_STRING);
+      $pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+      $pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+
+      $this->pdo = $pdo;
     } catch (Exception $err) {
       echo '<pre>';
       print_r($err->getMessage());
       echo '</pre>';
       exit;
     }
-  }
-
-  private function setAttributes()
-  {
-    $this->objPdo->setAttribute(PDO::ATTR_ORACLE_NULLS, PDO::NULL_EMPTY_STRING);
-    $this->objPdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
-    $this->objPdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-  }
-
-  /**
-   * ! Métodos de conexão com o banco de dados FIREBIRD
-   */
-  private function firebirdStringConnection(object $instance)
-  {
-    $this->stringConnection = $instance->dsn() . ':dbname=' . $instance->host() . ':' . $instance->path() . ';charset=utf-8;dialect=1';
   }
 }
