@@ -2,50 +2,70 @@
 
 namespace App\Database\Configs;
 
-use App\Database\Configs\Database;
-use App\Interfaces\iDatabaseConfig;
+use App\Utils\QueryBuilderUtils;
 
+/**
+ * Construtor da classe privado, use o método estático "getInstance"
+ */
 class Query
 {
-  private Database $database;
-
   private static self $selfInstance;
 
   private array $query;
 
-  public function __construct(iDatabaseConfig $instance)
+  private array $comparison = ['=', '>', '<', '>=', '<=', '<>', 'between'];
+
+  private function __construct()
   {
-    $this->database = new Database($instance);
-    if (!isset($selfInstance))
-      $this->selfInstance = new self($instance);
   }
 
+  public static function getInstance(): self
+  {
+    if (!isset(self::$selfInstance))
+      self::$selfInstance = new self();
+
+    return self::$selfInstance;
+  }
+
+  // Caso fields seja um array, só serão consideradas as chaves
   public function select(array|string $fields = '*'): self
   {
-    $this->query[] = 'SELECT ' . $fields;
-    return $this->selfInstance;
+    if (is_string($fields)) {
+      $field = QueryBuilderUtils::clearString($fields);
+      $this->query['SELECT'] = 'SELECT ' . $field;
+    }
+
+    $concatenated = [];
+    foreach ($fields as $field) {
+      if (!is_string($field) || empty($field))
+        continue;
+
+      $field = QueryBuilderUtils::clearString($field);
+      $concatenated[0] = $concatenated[0] . $field . ',';
+    }
+
+    $this->query['SELECT'] = 'SELECT ' . substr_replace($concatenated[0], '', -1);
+    return self::$selfInstance;
   }
 
   public function from(string $field): self
   {
-    $this->query[] = 'FROM ' . $field;
-    return $this->selfInstance;
+    $this->query['FROM'] = QueryBuilderUtils::clearString($field);
+    return self::$selfInstance;
   }
 
-  public function where(array|string $fieldsAndValues): self
+  /**
+   * @param $field, Campo no banco
+   * @param $value, Valor a ser comprado
+   * @param $comparison, Operador de comparação
+   */
+  public function where(string $field, string|int $value, string $comparison = '='): self
   {
-    if (is_array($fieldsAndValues)) {
-      $concatenated = [];
+    $field =
+      $value =
 
-      foreach ($fieldsAndValues as $key => $value) {
-        $string = $key . ' = ' . $value;
-
-        $concatenated[0] = $concatenated[0] . $string;
-      }
-    }
-
-    $this->query[] = ' AND ' . $concatenated[0] ?? $fieldsAndValues;
-    return $this->selfInstance;
+      $this->query['WHERE'] = 'WHERE ' . $field . ' = ' . $value;
+    return self::$selfInstance;
   }
 
   public function andWhere(array|string $fieldsAndValues): self
@@ -61,7 +81,7 @@ class Query
     }
 
     $this->query[] = ' AND ' . $concatenated[0] ?? $fieldsAndValues;
-    return $this->selfInstance;
+    return self::$selfInstance;
   }
 
   public function run(): void
@@ -82,5 +102,19 @@ class Query
     }
 
     return $concatenated[0];
+  }
+
+  private function mountArrayFields(array $fields, string $clauses = null)
+  {
+    // $concatenated = [];
+
+    // foreach ($fields as $key => $value) {
+    //   $concatenated[0] = $key $value;
+    // }
+
+    // echo '<pre>';
+    // print_r($concatenated);
+    // echo '</pre>';
+    // exit;
   }
 }
