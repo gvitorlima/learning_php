@@ -36,18 +36,11 @@ class Database
   {
     try {
 
-      echo '<pre>';
-      print_r($instance->stringConnection());
-      echo '</pre>';
-      exit;
+      $this->pdo = new PDO($instance->stringConnection(), $instance->user(), $instance->password());
 
-      $pdo = new PDO($instance->stringConnection(), $instance->user(), $instance->password());
-
-      $pdo->setAttribute(PDO::ATTR_ORACLE_NULLS, PDO::NULL_EMPTY_STRING);
-      $pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
-      $pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-
-      $this->pdo = $pdo;
+      $this->pdo->setAttribute(PDO::ATTR_ORACLE_NULLS, PDO::NULL_EMPTY_STRING);
+      $this->pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+      $this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
     } catch (Exception $err) {
       echo '<pre>';
       print_r($err->getMessage());
