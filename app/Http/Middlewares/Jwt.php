@@ -44,6 +44,10 @@ class Jwt extends AbstractMiddleware
     }
   }
 
+  /**
+   * Método de validação apenas fragmenta o JWT recebido em Header, Payload e na Signature. 
+   * Após isso é realizado o hash dos dados com a assinatura presente no projeto, e comparada com a assinatura passada e por fim, a comparação.
+   */
   private function verifyJwt(Request $request): void
   {
     try {
