@@ -3,6 +3,7 @@
 namespace App\Database\Configs;
 
 use App\Utils\QueryBuilderUtils;
+use Exception;
 
 /**
  * Construtor da classe privado, use o método estático "getInstance"
@@ -13,7 +14,7 @@ class Query
 
   private array $query;
 
-  private array $comparison = ['=', '>', '<', '>=', '<=', '<>', 'between'];
+  private array $comparison = ['=', '>', '<', '>=', '<=', '<>'];
 
   private function __construct()
   {
@@ -32,7 +33,7 @@ class Query
   {
     if (is_string($fields)) {
       $field = QueryBuilderUtils::clearString($fields);
-      $this->query['SELECT'] = 'SELECT ' . $field;
+      $this->query['SELECT'] = $field;
     }
 
     $concatenated = [];
@@ -44,7 +45,7 @@ class Query
       $concatenated[0] = $concatenated[0] . $field . ',';
     }
 
-    $this->query['SELECT'] = 'SELECT ' . substr_replace($concatenated[0], '', -1);
+    $this->query['SELECT'] = substr_replace($concatenated[0], '', -1);
     return self::$selfInstance;
   }
 
@@ -61,60 +62,91 @@ class Query
    */
   public function where(string $field, string|int $value, string $comparison = '='): self
   {
-    $field =
-      $value =
+    $field = QueryBuilderUtils::clearString($field);
+    $value = QueryBuilderUtils::clearString($value);
 
-      $this->query['WHERE'] = 'WHERE ' . $field . ' = ' . $value;
+    if (!in_array($comparison, $this->comparison))
+      throw new Exception("Comparador não pode ser usado: $comparison", 400);
+
+    $this->query['WHERE'] = [
+      'FIELD' => $field,
+      'OPERATOR' => $comparison,
+      'VALUE' => $value
+    ];
     return self::$selfInstance;
   }
 
-  public function andWhere(array|string $fieldsAndValues): self
+  public function andWhere(string $field, string|int $value, string $comparison = '='): self
   {
-    if (is_array($fieldsAndValues)) {
-      $concatenated = [];
+    $field = QueryBuilderUtils::clearString($field);
+    $value = QueryBuilderUtils::clearString($value);
 
-      foreach ($fieldsAndValues as $key => $value) {
-        $string = $key . ' = ' . $value;
+    if (!in_array($comparison, $this->comparison))
+      throw new Exception("Comparador não pode ser usado: $comparison", 400);
 
-        $concatenated[0] = $concatenated[0] . $string;
+    $this->query['AND'][] = [
+      'FIELD' => $field,
+      'OPERATOR' => $comparison,
+      'VALUE' => $value
+    ];
+
+    return self::$selfInstance;
+  }
+
+  public function run(): array
+  {
+    $queryAndValues = $this->mountQuery();
+    return $queryAndValues;
+  }
+
+  private function mountQuery(): array
+  {
+    $selectQuery = 'SELECT ' . $this->query['SELECT'];
+    $fromQuery = 'FROM ' . $this->query['FROM'];
+
+    if ($this->query['WHERE']) {
+      $whereQuery = $this->mountWhereQuery([$this->query['WHERE']], 'WHERE');
+
+      if ($this->query['AND']) {
+        $andQuery = $this->mountWhereQuery($this->query['AND'], 'AND');
       }
     }
 
-    $this->query[] = ' AND ' . $concatenated[0] ?? $fieldsAndValues;
-    return self::$selfInstance;
-  }
+    $query = $selectQuery . ' ' . $fromQuery;
+    if ($whereQuery) {
+      $values = [];
+      $values = $whereQuery['VALUES'];
 
-  public function run(): void
-  {
-    $sql = $this->mountQuery();
-    echo '<pre>';
-    print_r($sql);
-    echo '</pre>';
-    exit;
-  }
+      $query = $query . ' ' . $whereQuery['QUERY'][0];
 
-  private function mountQuery(): string
-  {
-    $concatenated = [];
+      if ($andQuery) {
+        $values = array_merge($values, $andQuery['VALUES']);
 
-    foreach ($this->query as $key => $value) {
-      $concatenated[0] = $concatenated[0] . $value . ' ';
+        $query = $query . ' ' . $andQuery['QUERY'][0];
+      }
     }
 
-    return $concatenated[0];
+    return [
+      'QUERY' => $query,
+      'VALUES' => $values
+    ];
   }
 
-  private function mountArrayFields(array $fields, string $clauses = null)
+  private function mountWhereQuery(array $fieldsAndValues, string $operator): array
   {
-    // $concatenated = [];
+    $query = [];
+    $values = [];
 
-    // foreach ($fields as $key => $value) {
-    //   $concatenated[0] = $key $value;
-    // }
+    foreach ($fieldsAndValues as $value) {
+      $query[0] = $query[0] . ' ' . $operator . ' ';
+      $query[0] = $query[0] .  $value['FIELD'] . ' ' . $value['OPERATOR'] . ' :' . $value['FIELD'];
 
-    // echo '<pre>';
-    // print_r($concatenated);
-    // echo '</pre>';
-    // exit;
+      $values[$value['FIELD']] = $value['VALUE'];
+    }
+
+    return [
+      "QUERY" => $query,
+      'VALUES' => $values
+    ];
   }
 }
