@@ -34,18 +34,19 @@ class Query
     if (is_string($fields)) {
       $field = QueryBuilderUtils::clearString($fields);
       $this->query['SELECT'] = $field;
+    } else {
+
+      $concatenated = [];
+      foreach ($fields as $field) {
+        if (!is_string($field) || empty($field))
+          continue;
+
+        $field = QueryBuilderUtils::clearString($field);
+        $concatenated[0] = $concatenated[0] . $field . ',';
+      }
+
+      $this->query['SELECT'] = substr_replace($concatenated[0], '', -1);
     }
-
-    $concatenated = [];
-    foreach ($fields as $field) {
-      if (!is_string($field) || empty($field))
-        continue;
-
-      $field = QueryBuilderUtils::clearString($field);
-      $concatenated[0] = $concatenated[0] . $field . ',';
-    }
-
-    $this->query['SELECT'] = substr_replace($concatenated[0], '', -1);
     return self::$selfInstance;
   }
 
@@ -139,9 +140,9 @@ class Query
 
     foreach ($fieldsAndValues as $value) {
       $query[0] = $query[0] . ' ' . $operator . ' ';
-      $query[0] = $query[0] .  $value['FIELD'] . ' ' . $value['OPERATOR'] . ' :' . $value['FIELD'];
+      $query[0] = $query[0] .  $value['FIELD'] . ' ' . $value['OPERATOR']  . ' :' . QueryBuilderUtils::clearAlias($value['FIELD']);
 
-      $values[$value['FIELD']] = $value['VALUE'];
+      $values[QueryBuilderUtils::clearAlias($value['FIELD'])] =  $value['VALUE'];
     }
 
     return [
