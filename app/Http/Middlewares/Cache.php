@@ -17,7 +17,7 @@ class Cache extends AbstractMiddleware
 
   private Response $response;
 
-  private function __construct()
+  public function __construct()
   {
     $this->response = new Response(200, '');
   }
@@ -25,7 +25,6 @@ class Cache extends AbstractMiddleware
   public function handle(Request $request, Closure $next)
   {
     try {
-      $this->__construct();
       return $this->cache($request, $next);
     } catch (Exception $err) {
       $err = $this->response->setResponse($err->getCode(), formatResponseError($err));

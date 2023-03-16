@@ -11,14 +11,13 @@ class Jwt extends AbstractMiddleware
 {
   private Response $response;
 
-  private function __construct()
+  public function __construct()
   {
     $this->response = new Response(200, '');
   }
 
   public function handle(Request $request, Closure $next)
   {
-    $this->__construct();
     $this->verifyJwt($request);
     return $next($request);
   }
