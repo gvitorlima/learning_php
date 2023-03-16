@@ -30,7 +30,7 @@ class Cache extends AbstractMiddleware
   private function cache(Request $request, Closure $next)
   {
     $this->fileName = $this->mountName($request->getUri());
-    $this->pathCache = $request->getRootPath() . '/../app/Cache/';
+    $this->pathCache = $request->getRootPath() . '/../app/Storage/Cache/';
     if (!$this->validateCache()) {
       $data = $next($request);
       $this->create($data);
