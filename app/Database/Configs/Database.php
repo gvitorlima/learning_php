@@ -15,20 +15,25 @@ class Database
     $this->configConnection($databaseInstance);
   }
 
-  public function executeQuery(string $query)
+  public function executeQuery(array $queryAndValues)
   {
     try {
-
       $this->pdo->beginTransaction();
-      $prepareQuery = $this->pdo->prepare($query);
-      $prepareQuery->execute();
+
+      $prepareQuery = $this->pdo->prepare($queryAndValues['QUERY']);
+      $prepareQuery->execute($queryAndValues['VALUES']);
 
       $results = $prepareQuery->fetchAll(PDO::FETCH_ASSOC);
+
       $this->pdo->commit();
 
       return $results;
     } catch (Exception $err) {
       $this->pdo->rollBack();
+      echo '<pre>';
+      print_r($err->getMessage());
+      echo '</pre>';
+      exit;
     }
   }
 
