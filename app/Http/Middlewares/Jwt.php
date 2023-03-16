@@ -77,7 +77,7 @@ class Jwt extends AbstractMiddleware
       return;
     } catch (Exception $err) {
       $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
-      return $this->response->sendResponse();
+      $this->response->sendResponse();
     }
   }
 

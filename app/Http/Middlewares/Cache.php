@@ -29,7 +29,7 @@ class Cache extends AbstractMiddleware
       return $this->cache($request, $next);
     } catch (Exception $err) {
       $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
-      return $this->response->sendResponse();
+      $this->response->sendResponse();
     }
   }
 

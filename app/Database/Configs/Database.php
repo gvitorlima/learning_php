@@ -34,7 +34,7 @@ class Database
     } catch (Exception $err) {
       $this->pdo->rollBack();
       $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
-      return $this->response->sendResponse();
+      $this->response->sendResponse();
     }
   }
 
@@ -49,7 +49,7 @@ class Database
       $this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
     } catch (Exception $err) {
       $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
-      return $this->response->sendResponse();
+      $this->response->sendResponse();
     }
   }
 }
