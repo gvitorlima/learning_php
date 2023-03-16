@@ -2,11 +2,11 @@
 
 namespace App\Http\Middlewares;
 
+use App\Exceptions\CacheException;
 use App\Http\Request;
 use App\Http\Response;
 use Closure;
 use DateTime;
-use Exception;
 
 class Cache extends AbstractMiddleware
 {
@@ -26,8 +26,8 @@ class Cache extends AbstractMiddleware
   {
     try {
       return $this->cache($request, $next);
-    } catch (Exception $err) {
-      $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
+    } catch (CacheException $error) {
+      $error = $this->response->setResponse($error->getCode(), formatResponseError($error));
       $this->response->sendResponse();
     }
   }
