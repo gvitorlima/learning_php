@@ -10,7 +10,7 @@ class Jwt extends AbstractMiddleware
 {
   public function handle(Request $request, Closure $next)
   {
-    // $this->verifyJwt($request);
+    $this->verifyJwt($request);
     return $next($request);
   }
 
@@ -30,7 +30,7 @@ class Jwt extends AbstractMiddleware
       $header = json_encode($header);
       $payload = json_encode($payload);
 
-      $signature = hash_hmac("SHA256", self::base64encode($header) . '.' . self::base64encode($payload), getenv('JWT_SALT'), true);
+      $signature = hash_hmac("SHA256", self::base64encode($header) . '.' . self::base64encode($payload), getenv('JWT_SECRET'), true);
 
       $jwt = self::base64encode($header) . '.' . self::base64encode($payload) . '.' . self::base64encode($signature);
       return [
@@ -44,9 +44,24 @@ class Jwt extends AbstractMiddleware
     }
   }
 
-  private function verifyJwt(Request $request)
+  private function verifyJwt(Request $request): void
   {
     try {
+      $jwt = explode('Bearer ', $request->getHeaders()['Authorization']);
+      if (!$jwt[1]) {
+        throw new Exception("Token invalido, ou não subsequente de 'Bearer'.", 400);
+      }
+      $jwt = explode('.', $jwt[1]);
+
+      $header   = $jwt[0];
+      $payload  = $jwt[1];
+      $token    = $this->base64decode($jwt[2]);
+
+      if (!hash_hmac("SHA256", $header . '.' . $payload, getenv('JWT_SECRET'), true) == $token) {
+        throw new Exception("Não autorizado", 401);
+      }
+
+      return;
     } catch (Exception $err) {
       echo '<pre>';
       print_r($err->getMessage());
