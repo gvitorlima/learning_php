@@ -3,13 +3,22 @@
 namespace App\Http\Middlewares;
 
 use App\Http\Request;
+use App\Http\Response;
 use Closure;
 use Exception;
 
 class Jwt extends AbstractMiddleware
 {
+  private Response $response;
+
+  private function __construct()
+  {
+    $this->response = new Response(200, '');
+  }
+
   public function handle(Request $request, Closure $next)
   {
+    $this->__construct();
     $this->verifyJwt($request);
     return $next($request);
   }
@@ -37,10 +46,10 @@ class Jwt extends AbstractMiddleware
         'token' => $jwt
       ];
     } catch (Exception $err) {
-      echo '<pre>';
-      print_r($err->getMessage());
-      echo '</pre>';
-      exit;
+      $response = new Response(200, '');
+
+      $err = $response->setResponse($err->getCode(), formatResponseError($err));
+      return $response->sendResponse();
     }
   }
 
@@ -67,10 +76,8 @@ class Jwt extends AbstractMiddleware
 
       return;
     } catch (Exception $err) {
-      echo '<pre>';
-      print_r($err->getMessage());
-      echo '</pre>';
-      exit;
+      $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
+      return $this->response->sendResponse();
     }
   }
 

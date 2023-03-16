@@ -4,16 +4,19 @@ namespace App\Controller\Login;
 
 use App\Http\Middlewares\Jwt;
 use App\Http\Request;
+use App\Http\Response;
 use App\Repository\Login\LoginRepository;
 use Exception;
 
 class LoginController
 {
   private LoginRepository $repository;
+  private Response $response;
 
   public function __construct()
   {
     $this->repository = new LoginRepository;
+    $this->response = new Response(200, '');
   }
 
   public function login(Request $request)
@@ -36,10 +39,6 @@ class LoginController
       $request->setPayload($userData);
       return Jwt::create($request);
     } catch (Exception $err) {
-      echo '<pre>';
-      print_r($err->getMessage());
-      echo '</pre>';
-      exit;
     }
   }
 

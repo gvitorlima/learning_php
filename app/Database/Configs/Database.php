@@ -2,6 +2,7 @@
 
 namespace App\Database\Configs;
 
+use App\Http\Response;
 use App\Interfaces\iDatabaseConfig;
 use Exception;
 use PDO;
@@ -9,10 +10,12 @@ use PDO;
 class Database
 {
   private PDO $pdo;
+  private Response $response;
 
   public function __construct(iDatabaseConfig $databaseInstance)
   {
     $this->configConnection($databaseInstance);
+    $this->response = new Response(200, '');
   }
 
   public function executeQuery(array $queryAndValues)
@@ -30,10 +33,8 @@ class Database
       return $results;
     } catch (Exception $err) {
       $this->pdo->rollBack();
-      echo '<pre>';
-      print_r($err->getMessage());
-      echo '</pre>';
-      exit;
+      $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
+      return $this->response->sendResponse();
     }
   }
 
@@ -47,10 +48,8 @@ class Database
       $this->pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
       $this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
     } catch (Exception $err) {
-      echo '<pre>';
-      print_r($err->getMessage());
-      echo '</pre>';
-      exit;
+      $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
+      return $this->response->sendResponse();
     }
   }
 }

@@ -15,15 +15,21 @@ class Cache extends AbstractMiddleware
     $filePath,
     $pathCache;
 
+  private Response $response;
+
+  private function __construct()
+  {
+    $this->response = new Response(200, '');
+  }
+
   public function handle(Request $request, Closure $next)
   {
     try {
+      $this->__construct();
       return $this->cache($request, $next);
     } catch (Exception $err) {
-      echo '<pre>';
-      print_r($err->getMessage());
-      echo '</pre>';
-      exit;
+      $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
+      return $this->response->sendResponse();
     }
   }
 
