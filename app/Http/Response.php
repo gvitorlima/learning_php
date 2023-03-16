@@ -33,8 +33,8 @@ class Response
       case 'application/json':
 
         $this->sendHeaders();
-        $content = json_encode($this->content);
-        print_r($content);
+        $this->content = json_encode($this->content);
+        print_r($this->content);
         exit;
 
       case 'text/html':
