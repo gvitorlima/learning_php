@@ -3,6 +3,7 @@
 namespace App\Database\Configs;
 
 use App\Utils\QueryBuilderUtils;
+use App\Database\Configs\MountQuery;
 use Exception;
 
 /**
@@ -10,14 +11,19 @@ use Exception;
  */
 class Query
 {
+  private MountQuery $mountQuery;
   private static self $selfInstance;
 
-  private array $query;
+  private array $query = [
+    'QUERY' => null,
+    'VALUES' => null
+  ];
 
   private array $comparison = ['=', '>', '<', '>=', '<=', '<>'];
 
   private function __construct()
   {
+    $this->mountQuery = new MountQuery;
   }
 
   public static function getInstance(): self
@@ -29,31 +35,37 @@ class Query
   }
 
   // Caso fields seja um array, só serão consideradas as chaves
-  public function select(array|string $fields = '*'): self
+  public function select(array|string $fields, string $table): self
   {
     if (is_string($fields)) {
       $field = QueryBuilderUtils::clearString($fields);
-      $this->query['SELECT'] = $field;
+      $this->query['QUERY']['SELECT'] = [
+        'TABLE' => $table,
+        'FIELDS' => $field
+      ];
     } else {
-
-      $concatenated = [];
       foreach ($fields as $field) {
         if (!is_string($field) || empty($field))
           continue;
 
-        $field = QueryBuilderUtils::clearString($field);
-        $concatenated[0] = $concatenated[0] . $field . ',';
+        $clearFields[] = QueryBuilderUtils::clearString($field);
       }
 
-      $this->query['SELECT'] = substr_replace($concatenated[0], '', -1);
+      $this->query['QUERY']['SELECT'] = [
+        'TABLE' => $table,
+        'FIELDS' => $clearFields
+      ];
     }
+
     return self::$selfInstance;
   }
 
-  public function from(string $field): self
+  public function update(string $table, string $field, int|string $value): self
   {
-    $this->query['FROM'] = QueryBuilderUtils::clearString($field);
-    return self::$selfInstance;
+    $this->query['QUERY']['UPDATE'] = [
+      $field => QueryBuilderUtils::clearString($value)
+    ];
+    return $this->selfInstance;
   }
 
   /**
@@ -69,7 +81,7 @@ class Query
     if (!in_array($comparison, $this->comparison))
       throw new Exception("Comparador não pode ser usado: $comparison", 400);
 
-    $this->query['WHERE'] = [
+    $this->query['QUERY']['WHERE'] = [
       'FIELD' => $field,
       'OPERATOR' => $comparison,
       'VALUE' => $value
@@ -85,7 +97,7 @@ class Query
     if (!in_array($comparison, $this->comparison))
       throw new Exception("Comparador não pode ser usado: $comparison", 400);
 
-    $this->query['AND'][] = [
+    $this->query['QUERY']['AND'][] = [
       'FIELD' => $field,
       'OPERATOR' => $comparison,
       'VALUE' => $value
@@ -94,14 +106,43 @@ class Query
     return self::$selfInstance;
   }
 
+  public function innerJoin(string $table, string $innerTable, string $comparison = '='): self
+  {
+    $this->query['QUERY']['INNER JOIN'][] = [
+      'TABLE' => $table,
+      'INNER TABLE' => $innerTable,
+      'COMPARISON' => $comparison
+    ];
+
+    return $this->selfInstance;
+  }
+
   public function run(): array
   {
     $queryAndValues = $this->mountQuery();
     return $queryAndValues;
   }
 
+  /**
+   * * A query é montada de acordo a ordem de chamada das funções. Logo, possíveis queries erradas podem ser montadas. CUIDADO
+   */
   private function mountQuery(): array
   {
+    $this->__construct();
+    foreach ($this->query['QUERY'] as $key => $_) {
+
+      match ($key) {
+        'SELECT' => $this->mountQuery->select($this->query['QUERY']['SELECT']),
+        'UPDATE' => $this->mountQuery->update($this->query['QUERY']['UPDATE']),
+        'WHERE' => $this->mountQuery->where($this->query['QUERY']['WHERE']),
+        'AND' => $this->mountQuery->and($this->query['QUERY']['AND']),
+        'INNER JOIN' => $this->mountQuery->innerJoin($this->query['QUERY']['INNER JOIN']),
+      };
+    }
+    echo '<pre>';
+    // print_r($this->query);
+    echo '</pre>';
+    exit;
     $selectQuery = 'SELECT ' . $this->query['SELECT'];
     $fromQuery = 'FROM ' . $this->query['FROM'];
 
