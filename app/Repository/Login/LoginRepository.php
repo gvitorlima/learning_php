@@ -18,11 +18,10 @@ class LoginRepository
 
   public function get(string $email)
   {
-    $query = $this->queryBuilder->select()
-      ->from('AUTH a')->where('a.EMAIL', $email)->run();
+    $query = $this->queryBuilder->select('*', 'AUTH a')
+      ->where('a.EMAIL', $email)->getQuery();
 
     $data = $this->database->executeQuery($query);
-
     return $data[array_key_first($data)] ?? [];
   }
 }
