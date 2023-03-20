@@ -23,7 +23,7 @@ class Jwt extends AbstractMiddleware
     return $next($request);
   }
 
-  public static function create(Request $request)
+  public function create(Request $request)
   {
     try {
 
@@ -59,7 +59,7 @@ class Jwt extends AbstractMiddleware
    * Método de validação apenas fragmenta o JWT recebido em Header, Payload e na Signature. 
    * Após isso é realizado o hash dos dados com a assinatura presente no projeto, e comparada com a assinatura passada e por fim, a comparação.
    */
-  private function verifyJwt(Request $request): void
+  public function verifyJwt(Request $request): void
   {
     try {
       $jwt = explode('Bearer ', $request->getHeaders()['Authorization']);
@@ -107,13 +107,13 @@ class Jwt extends AbstractMiddleware
    * Por isso, o caractere '=' é omitido no final do token JWT, a menos que seja estritamente necessário para preencher o último bloco de caracteres.
    * Isso garante a compatibilidade do token JWT em ambientes web e evita possíveis problemas de segurança.
    */
-  private static function base64encode(string $data)
+  public function base64encode(string $data)
   {
     $data = base64_encode($data);
     return str_replace(['+', '/', '='], ['-', '_', ''], $data);
   }
 
-  private function base64decode(string $data)
+  public function base64decode(string $data)
   {
     return base64_decode(str_replace(['-', '_'], ['+', '/'], $data));
   }
