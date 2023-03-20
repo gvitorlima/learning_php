@@ -5,6 +5,7 @@ namespace App\Http\Middlewares;
 use App\Http\Request;
 use App\Http\Response;
 use Closure;
+use DateTime;
 use Exception;
 
 class Jwt extends AbstractMiddleware
@@ -36,6 +37,8 @@ class Jwt extends AbstractMiddleware
       ];
 
       $header = json_encode($header);
+
+      $payload['created_at'] = (new DateTime())->format('Y-m-d H:i');
       $payload = json_encode($payload);
 
       $signature = hash_hmac("SHA256", self::base64encode($header) . '.' . self::base64encode($payload), getenv('JWT_SECRET'), true);
@@ -69,9 +72,16 @@ class Jwt extends AbstractMiddleware
       $payload  = $jwt[1];
       $token    = $this->base64decode($jwt[2]);
 
-      if (!hash_hmac("SHA256", $header . '.' . $payload, getenv('JWT_SECRET'), true) == $token) {
+      if (!hash_hmac("SHA256", $header . '.' . $payload, getenv('JWT_SECRET'), true) == $token)
         throw new Exception("Não autorizado", 401);
-      }
+
+      $payload = json_decode($this->base64decode($payload), true);
+
+      $dateJwt = date_create($payload['created_at']);
+      $dateJwt = (new DateTime)->diff($dateJwt);
+
+      if ($dateJwt->i >= 20 || $dateJwt->h >= 1 || $dateJwt->d >= 1)
+        throw new Exception("Token expirado", 401);
 
       return;
     } catch (Exception $err) {
