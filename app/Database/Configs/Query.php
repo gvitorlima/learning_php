@@ -115,7 +115,7 @@ class Query
     return $this->selfInstance;
   }
 
-  public function run(): array
+  public function getQuery(): array
   {
     $queryAndValues = $this->mountQuery();
     return $queryAndValues;

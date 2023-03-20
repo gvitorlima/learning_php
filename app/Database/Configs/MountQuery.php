@@ -26,10 +26,12 @@ class MountQuery
     return $stringQuery;
   }
 
+  // TODO ESSE NEGÓCIOS ABAIXO
   public function update(array $query)
   {
   }
 
+  // TODO ESSE NEGÓCIOS ABAIXO
   public function from(array $query)
   {
   }
@@ -54,6 +56,7 @@ class MountQuery
     return $stringQuery;
   }
 
+  // TODO ESSE NEGÓCIOS ABAIXO
   public function innerJoin(array $query)
   {
   }
