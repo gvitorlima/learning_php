@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middlewares\Queue;
+use App\Http\Rules\QueueRules;
 use Closure;
 use Exception;
 
@@ -58,6 +59,10 @@ class Router
       $route = $this->getRoute();
       if (!isset($route['controller']))
         throw new Exception('O servidor não pode processar essa requisição', 500);
+
+      (new QueueRules(
+        $route['rules'] ?? [],
+      ))->next(self::$request);
 
       $queue = new Queue(
         $route['middlewares'] ?? [],
