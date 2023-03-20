@@ -14,10 +14,8 @@ class Query
   private MountQuery $mountQuery;
   private static self $selfInstance;
 
-  private array $query = [
-    'QUERY' => null,
-    'VALUES' => null
-  ];
+  private array $query = [];
+
 
   private array $comparison = ['=', '>', '<', '>=', '<=', '<>'];
 
@@ -39,7 +37,7 @@ class Query
   {
     if (is_string($fields)) {
       $field = QueryBuilderUtils::clearString($fields);
-      $this->query['QUERY']['SELECT'] = [
+      $this->query['SELECT'] = [
         'TABLE' => $table,
         'FIELDS' => $field
       ];
@@ -51,7 +49,7 @@ class Query
         $clearFields[] = QueryBuilderUtils::clearString($field);
       }
 
-      $this->query['QUERY']['SELECT'] = [
+      $this->query['SELECT'] = [
         'TABLE' => $table,
         'FIELDS' => $clearFields
       ];
@@ -62,7 +60,7 @@ class Query
 
   public function update(string $table, string $field, int|string $value): self
   {
-    $this->query['QUERY']['UPDATE'] = [
+    $this->query['UPDATE'] = [
       $field => QueryBuilderUtils::clearString($value)
     ];
     return $this->selfInstance;
@@ -81,7 +79,7 @@ class Query
     if (!in_array($comparison, $this->comparison))
       throw new Exception("Comparador não pode ser usado: $comparison", 400);
 
-    $this->query['QUERY']['WHERE'] = [
+    $this->query['WHERE'] = [
       'FIELD' => $field,
       'OPERATOR' => $comparison,
       'VALUE' => $value
@@ -97,7 +95,7 @@ class Query
     if (!in_array($comparison, $this->comparison))
       throw new Exception("Comparador não pode ser usado: $comparison", 400);
 
-    $this->query['QUERY']['AND'][] = [
+    $this->query['AND'][] = [
       'FIELD' => $field,
       'OPERATOR' => $comparison,
       'VALUE' => $value
@@ -108,7 +106,7 @@ class Query
 
   public function innerJoin(string $table, string $innerTable, string $comparison = '='): self
   {
-    $this->query['QUERY']['INNER JOIN'][] = [
+    $this->query['INNER JOIN'][] = [
       'TABLE' => $table,
       'INNER TABLE' => $innerTable,
       'COMPARISON' => $comparison
@@ -129,48 +127,27 @@ class Query
   private function mountQuery(): array
   {
     $this->__construct();
-    foreach ($this->query['QUERY'] as $key => $_) {
+    foreach ($this->query as $key => $_) {
 
-      match ($key) {
-        'SELECT' => $this->mountQuery->select($this->query['QUERY']['SELECT']),
-        'UPDATE' => $this->mountQuery->update($this->query['QUERY']['UPDATE']),
-        'WHERE' => $this->mountQuery->where($this->query['QUERY']['WHERE']),
-        'AND' => $this->mountQuery->and($this->query['QUERY']['AND']),
-        'INNER JOIN' => $this->mountQuery->innerJoin($this->query['QUERY']['INNER JOIN']),
+      $arrayQueries[] = match ($key) {
+        'SELECT' => $this->mountQuery->select($this->query[$key]),
+        'UPDATE' => $this->mountQuery->update($this->query[$key]),
+        'WHERE'  => $this->mountQuery->where($this->query[$key]),
+        'AND'    => $this->mountQuery->and($this->query[$key]),
+        'INNER JOIN' => $this->mountQuery->innerJoin($this->query[$key]),
       };
     }
-    echo '<pre>';
-    // print_r($this->query);
-    echo '</pre>';
-    exit;
-    $selectQuery = 'SELECT ' . $this->query['SELECT'];
-    $fromQuery = 'FROM ' . $this->query['FROM'];
 
-    if ($this->query['WHERE']) {
-      $whereQuery = $this->mountWhereQuery([$this->query['WHERE']], 'WHERE');
-
-      if ($this->query['AND']) {
-        $andQuery = $this->mountWhereQuery($this->query['AND'], 'AND');
-      }
+    $stringQuery = '';
+    foreach ($arrayQueries as $key => $query) {
+      $stringQuery = $stringQuery . $query . ' ';
     }
-
-    $query = $selectQuery . ' ' . $fromQuery;
-    if ($whereQuery) {
-      $values = [];
-      $values = $whereQuery['VALUES'];
-
-      $query = $query . ' ' . $whereQuery['QUERY'][0];
-
-      if ($andQuery) {
-        $values = array_merge($values, $andQuery['VALUES']);
-
-        $query = $query . ' ' . $andQuery['QUERY'][0];
-      }
-    }
+    $stringQuery = trim($stringQuery);
+    $valuesQuery = $this->mountQuery->getValues();
 
     return [
-      'QUERY' => $query,
-      'VALUES' => $values
+      'QUERY' => $stringQuery,
+      'VALUES' => $valuesQuery['VALUES']
     ];
   }
 
