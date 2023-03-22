@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Login;
 
 use App\Http\Middlewares\Jwt;
@@ -24,8 +26,8 @@ class LoginController
     $postVars = $request->getPostVars();
 
     try {
-      $email = $postVars['email'];
-      $password = $postVars['password'];
+      $email = (string)$postVars['email'];
+      $password = (string)$postVars['password'];
 
       if (empty($email) || empty($password))
         throw new Exception('Verifique os dados informados e tente novamente', 400);
