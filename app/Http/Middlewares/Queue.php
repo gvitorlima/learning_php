@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middlewares;
 
 use App\Http\Request;
@@ -19,7 +21,7 @@ class Queue
 
     $firstMiddleware = array_key_first($this->middlewares);
     $middleware = $this->middlewares[$firstMiddleware];
-    
+
     if (!class_exists($middleware))
       throw new Exception("middlewares inválido", 500);
 

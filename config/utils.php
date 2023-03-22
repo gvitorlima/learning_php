@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 function formatResponse(int $code, mixed $content = null, bool $json = false): string|array
 {
   $return = [
