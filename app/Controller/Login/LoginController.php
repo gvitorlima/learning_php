@@ -21,7 +21,6 @@ class LoginController
 
   public function login(Request $request)
   {
-    $patternErr = 'Verifique os dados informados e tente novamente';
     $postVars = $request->getPostVars();
 
     try {
@@ -29,15 +28,16 @@ class LoginController
       $password = $postVars['password'];
 
       if (empty($email) || empty($password))
-        throw new Exception($patternErr, 400);
-      // $hashPassword = $this->hashPassword($password);
+        throw new Exception('Verifique os dados informados e tente novamente', 400);
 
       $userData = $this->repository->get($email);
       if (empty($userData) || !password_verify($password, $userData['password']))
-        throw new Exception($patternErr, 404);
+        throw new Exception('Verifique os dados informados e tente novamente', 404);
 
       $request->setPayload($userData);
-      return (new Jwt)->create($request);
+      $this->response
+        ->setResponse(200, (new Jwt)->create($request))
+        ->sendResponse();
     } catch (Exception $err) {
     }
   }
