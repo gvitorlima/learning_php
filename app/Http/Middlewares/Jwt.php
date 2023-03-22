@@ -10,13 +10,6 @@ use Exception;
 
 class Jwt extends AbstractMiddleware
 {
-  private Response $response;
-
-  public function __construct()
-  {
-    $this->response = new Response(200, '');
-  }
-
   public function handle(Request $request, Closure $next)
   {
     $this->verifyJwt($request);
@@ -43,15 +36,11 @@ class Jwt extends AbstractMiddleware
 
       $signature = hash_hmac("SHA256", self::base64encode($header) . '.' . self::base64encode($payload), getenv('JWT_SECRET'), true);
 
-      $jwt = self::base64encode($header) . '.' . self::base64encode($payload) . '.' . self::base64encode($signature);
-      return [
-        'token' => $jwt
-      ];
+      return self::base64encode($header) . '.' . self::base64encode($payload) . '.' . self::base64encode($signature);
     } catch (Exception $err) {
-      $response = new Response(200, '');
 
-      $err = $response->setResponse($err->getCode(), formatResponseError($err));
-      return $response->sendResponse();
+      (new Response($err->getCode(), formatResponseError($err)))
+        ->sendResponse();
     }
   }
 
@@ -85,8 +74,9 @@ class Jwt extends AbstractMiddleware
 
       return;
     } catch (Exception $err) {
-      $err = $this->response->setResponse($err->getCode(), formatResponseError($err));
-      $this->response->sendResponse();
+
+      (new Response($err->getCode(), formatResponseError($err)))
+        ->sendResponse();
     }
   }
 
