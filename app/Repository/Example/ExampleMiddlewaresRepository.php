@@ -23,7 +23,7 @@ class ExampleMiddlewaresRepository
   {
     $query = $this->queryBuilder->select('*', 'AUTH a')
       ->where('a.EMAIL', 'teste@teste.com')
-      ->andWhere('a.PASSWORD', '$2y$10$EHa4PHz.KEsX1LH08WNbiOINxFGtrr7WQ.tBqfOga4B/Dk2EE7VGS')
+      ->andWhere('a.PASSWORD', '$2y$10$11LZ/6f1yPR.swShB3io3O8mcsBDH0QkgpF7CDXO2mldgFenGnzPa')
       ->getQuery();
 
     return $this->database->executeQuery($query);

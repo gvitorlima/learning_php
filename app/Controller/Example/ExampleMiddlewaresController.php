@@ -22,6 +22,7 @@ class ExampleMiddlewaresController
   public function example(Request $request)
   {
     $data = $this->repository->getCacheData()[0];
-    return $this->response->setResponse(200, $data);
+    $this->response->setResponse(200, $data);
+    return $data;
   }
 }
