@@ -20,7 +20,12 @@ class Queue
       return call_user_func_array($this->controller, $this->vars);
 
     $firstMiddleware = array_key_first($this->middlewares);
-    $middleware = $this->middlewares[$firstMiddleware];
+    if (is_numeric($firstMiddleware)) {
+      $middleware = $this->middlewares[$firstMiddleware];
+    } else {
+      $middleware = $firstMiddleware;
+      $middlewareParams = $this->middlewares[$firstMiddleware];
+    }
 
     if (!class_exists($middleware))
       throw new Exception("middlewares inválido", 500);
@@ -32,6 +37,10 @@ class Queue
     $next = function () use ($queue, $request) {
       return $queue->next($request);
     };
+
+    if ($middlewareParams) {
+      return $actualMiddleware($request, $next, $middlewareParams);
+    }
 
     return $actualMiddleware($request, $next);
   }

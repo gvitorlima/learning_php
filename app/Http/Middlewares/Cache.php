@@ -12,6 +12,10 @@ use DateTime;
 
 class Cache extends AbstractMiddleware
 {
+  public const
+    QUERY_PARAM = 'query_param',
+    HEADER_PARAM = 'header_param';
+
   private string
     $fileName,
     $filePath,
@@ -24,20 +28,29 @@ class Cache extends AbstractMiddleware
     $this->response = new Response(200, '');
   }
 
-  public function handle(Request $request, Closure $next)
+  public function handle(Request $request, Closure $next, mixed $params = null)
   {
     try {
-      return $this->cache($request, $next);
+      return $this->cache($request, $next, $params);
     } catch (CacheException $error) {
       $error = $this->response->setResponse($error->getCode(), formatResponseError($error));
       $this->response->sendResponse();
     }
   }
 
-  private function cache(Request $request, Closure $next)
+  private function cache(Request $request, Closure $next, mixed $params = null)
   {
-    $this->fileName = $this->mountName($request->getUri());
+    if ($params) {
+      $dynamicName = match (array_key_first($params)) {
+        self::QUERY_PARAM => $request->getQueryParams()[$params[array_key_first($params)]]
+      };
+
+      $dynamicName = preg_replace('/\D/', '', $dynamicName);
+    }
+
+    $this->fileName = $this->mountName($request->getUri(), $dynamicName);
     $this->pathCache = $request->getRootPath() . '/../app/Storage/Cache/';
+
     if (!$this->validateCache()) {
       $data = $next($request);
       $this->create($data);
@@ -77,12 +90,15 @@ class Cache extends AbstractMiddleware
     return true;
   }
 
-  private function mountName(string $route)
+  private function mountName(string $route, string $dynamicName = null)
   {
     $replacePath = str_replace('/', '_', $route);
     if (str_starts_with($replacePath, '_')) {
       $replacePath = substr($replacePath, 1);
     }
+
+    if ($dynamicName)
+      $replacePath = $replacePath . '_' . $dynamicName;
 
     return $replacePath . '.txt';
   }
