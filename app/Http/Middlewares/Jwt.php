@@ -12,7 +12,7 @@ use Exception;
 
 class Jwt extends AbstractMiddleware
 {
-  public function handle(Request $request, Closure $next)
+  public function handle(Request $request, Closure $next, mixed $params = null)
   {
     $this->verifyJwt($request);
     return $next($request);
