@@ -1,3 +1,7 @@
+## Projeto parado para fins de estudo. 
+
+Implementar testes utilizando o PEST
+
 # **Oque é isso?**
 
 Apenas um projeto básico feito com a intenção de aprender mais sobre a linguagem tal como alguns métodos/padrões utilizados na programação backend.
