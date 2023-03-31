@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Database\Configs;
+namespace app\Database\Configs;
 
-use App\Utils\QueryBuilderUtils;
+use app\Utils\QueryBuilderUtils;
 
 class MountQuery
 {

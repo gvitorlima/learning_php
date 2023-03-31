@@ -1,8 +1,8 @@
 <?php
 
-use App\Controller\Login\LoginController;
-use App\Http\Request;
-use App\Http\Router;
+use app\Controller\Login\LoginController;
+use app\Http\Request;
+use app\Http\Router;
 
 Router::post('/login', [
   function (Request $request) {

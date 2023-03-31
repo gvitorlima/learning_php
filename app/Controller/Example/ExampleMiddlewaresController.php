@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Example;
+namespace app\Controller\Example;
 
-use App\Http\Request;
-use App\Http\Response;
-use App\Repository\Example\ExampleMiddlewaresRepository;
+use app\Http\Request;
+use app\Http\Response;
+use app\Repository\Example\ExampleMiddlewaresRepository;
 
 class ExampleMiddlewaresController
 {

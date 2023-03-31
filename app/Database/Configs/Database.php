@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Database\Configs;
+namespace app\Database\Configs;
 
-use App\Http\Response;
-use App\Interfaces\iDatabaseConfig;
+use app\Http\Response;
+use app\Interfaces\iDatabaseConfig;
 use Exception;
 use PDO;
 

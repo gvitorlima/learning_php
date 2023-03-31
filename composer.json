@@ -2,7 +2,7 @@
     "name": "gabriel/recreating-classes",
     "autoload": {
         "psr-4": {
-            "App\\": "app/"
+            "app\\": "app/"
         }
     },
     "authors": [

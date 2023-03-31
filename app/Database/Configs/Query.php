@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Database\Configs;
+namespace app\Database\Configs;
 
-use App\Utils\QueryBuilderUtils;
-use App\Database\Configs\MountQuery;
+use app\Utils\QueryBuilderUtils;
+use app\Database\Configs\MountQuery;
 use Exception;
 
 /**

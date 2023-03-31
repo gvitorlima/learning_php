@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Rules;
+namespace app\Http\Rules;
 
-use App\Http\Middlewares\Jwt;
-use App\Http\Request;
-use App\Http\Response;
+use app\Http\Middlewares\Jwt;
+use app\Http\Request;
+use app\Http\Response;
 use Closure;
 use Exception;
 

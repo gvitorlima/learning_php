@@ -1,11 +1,11 @@
 <?php
 
-use App\Controller\Example\ExampleMiddlewaresController;
-use App\Http\Middlewares\Cache;
-use App\Http\Middlewares\Jwt;
-use App\Http\Request;
-use App\Http\Router;
-use App\Http\Rules\Admin;
+use app\Controller\Example\ExampleMiddlewaresController;
+use app\Http\Middlewares\Cache;
+use app\Http\Middlewares\Jwt;
+use app\Http\Request;
+use app\Http\Router;
+use app\Http\Rules\Admin;
 
 /**
  * Exemplo de uso dos middlewares em uma rota.

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Login;
+namespace app\Controller\Login;
 
-use App\Http\Middlewares\Jwt;
-use App\Http\Request;
-use App\Http\Response;
-use App\Repository\Login\LoginRepository;
+use app\Http\Middlewares\Jwt;
+use app\Http\Request;
+use app\Http\Response;
+use app\Repository\Login\LoginRepository;
 use Exception;
 
 class LoginController

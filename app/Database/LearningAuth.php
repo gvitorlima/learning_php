@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Database;
+namespace app\Database;
 
-use App\Interfaces\iDatabaseConfig;
+use app\Interfaces\iDatabaseConfig;
 
 class LearningAuth implements iDatabaseConfig
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Repository\Example;
+namespace app\Repository\Example;
 
-use App\Database\Configs\Database;
-use App\Database\Configs\Query;
-use App\Database\LearningAuth;
+use app\Database\Configs\Database;
+use app\Database\Configs\Query;
+use app\Database\LearningAuth;
 
 class ExampleMiddlewaresRepository
 {

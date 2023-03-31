@@ -1,8 +1,8 @@
 <?php
 
-use App\Database\LearningAuth;
-use App\Http\Request;
-use App\Http\Router;
+use app\Database\LearningAuth;
+use app\Http\Request;
+use app\Http\Router;
 
 Router::get('/db/learn/instance', [
   function (Request $request) {

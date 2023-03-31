@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Controller\Classes;
+namespace app\Controller\Classes;
 
-use App\Http\Middlewares\Jwt;
-use App\Http\Request;
-use App\Http\Response;
-use App\Repository\Classes\JwtRepository;
+use app\Http\Middlewares\Jwt;
+use app\Http\Request;
+use app\Http\Response;
+use app\Repository\Classes\JwtRepository;
 use Exception;
 
 class JwtController

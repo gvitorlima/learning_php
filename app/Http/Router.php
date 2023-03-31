@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Http;
+namespace app\Http;
 
-use App\Http\Middlewares\Queue;
-use App\Http\Rules\QueueRules;
+use app\Http\Middlewares\Queue;
+use app\Http\Rules\QueueRules;
 use Closure;
 use Exception;
 

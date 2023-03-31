@@ -49,7 +49,7 @@ São passados em um array de "_middlewares_" no mesmo array que o controlador.
 **Exemplo**:
 
 ```php
-use App\Http\Middlewares\Cache;
+use app\Http\Middlewares\Cache;
 ...
 
 Router::get('/...',[

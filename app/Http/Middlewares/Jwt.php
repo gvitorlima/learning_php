@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Middlewares;
+namespace app\Http\Middlewares;
 
-use App\Http\Request;
-use App\Http\Response;
+use app\Http\Request;
+use app\Http\Response;
 use Closure;
 use DateTime;
 use Exception;

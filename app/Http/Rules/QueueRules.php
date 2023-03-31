@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Rules;
+namespace app\Http\Rules;
 
-use App\Http\Request;
+use app\Http\Request;
 use Exception;
 
 class QueueRules

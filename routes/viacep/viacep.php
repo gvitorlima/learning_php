@@ -1,9 +1,9 @@
 <?php
 
-use App\Controller\Viacep\ViacepController;
-use App\Http\Middlewares\Cache;
-use App\Http\Request;
-use App\Http\Router;
+use app\Controller\Viacep\ViacepController;
+use app\Http\Middlewares\Cache;
+use app\Http\Request;
+use app\Http\Router;
 
 Router::get('/cep', [
   'middlewares' => [

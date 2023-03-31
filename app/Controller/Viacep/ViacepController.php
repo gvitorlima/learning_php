@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Viacep;
+namespace app\Controller\Viacep;
 
-use App\Http\Fetch;
-use App\Http\Request;
-use App\Http\Response;
+use app\Http\Fetch;
+use app\Http\Request;
+use app\Http\Response;
 use Exception;
 
 class ViacepController

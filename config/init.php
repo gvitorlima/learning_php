@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Request;
-use App\Http\Response;
-use App\Http\Router;
+use app\Http\Request;
+use app\Http\Response;
+use app\Http\Router;
 
 define('URL', '127.0.0.1:8080/prefix');
 

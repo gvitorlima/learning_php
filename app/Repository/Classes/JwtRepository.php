@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repository\Classes;
+namespace app\Repository\Classes;
 
-use App\Database\Configs\Database;
-use App\Database\Configs\Query;
-use App\Database\LearningAuth;
+use app\Database\Configs\Database;
+use app\Database\Configs\Query;
+use app\Database\LearningAuth;
 
 class JwtRepository
 {
